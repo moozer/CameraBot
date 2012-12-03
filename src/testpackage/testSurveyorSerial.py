@@ -8,8 +8,6 @@ from Surveyor.SrvSerial import *
 from subprocess import Popen
 import serial
 import time
-import os
-
 
 SrvSerialDeviceLocal = "SocatTmpSerialLocal"
 SrvSerialDeviceRobot = "SocatTmpSerialRobot"
@@ -29,7 +27,6 @@ class Test(unittest.TestCase):
         self._EchoPopen.kill()
         pass
 
-#    @unittest.SkipTest
     def testPipe(self):
         self._EchoPopen.kill()
 
@@ -76,7 +73,6 @@ class Test(unittest.TestCase):
         SerConnA.flush()
         time.sleep( TimeoutTime)
         
-        print "send start"
         testData="a"
 
         SerConnA.write(testData)
@@ -85,15 +81,11 @@ class Test(unittest.TestCase):
             
         self.assertEqual( OutData, "#%s"%testData)
 
-    @unittest.SkipTest
     def testConnection(self):
         s = SrvSerial( SrvSerialDeviceLocal )
-        self.assertEqual( s.GetPort(), SrvSerialDeviceLocal )        
-        self.assertEqual(s.GetVersion, 'V' ) # bogus V 
-        pass
-
-        
-        
+        self.assertEqual( s.port, SrvSerialDeviceLocal )     
+        self.assertEqual( s.version, 'V' ) # bogus Version 
+        pass       
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testContruction']

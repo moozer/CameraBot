@@ -22,7 +22,7 @@ class SurveyorSerial( serial ):
               timeout=self._timeout, # timeout value in seconds, None for forever
               xonxoff=0, rtscts=0 )
 
-        self._port = port
+        self._Port = port
         
         try:
             self.GetVersion()
@@ -33,7 +33,7 @@ class SurveyorSerial( serial ):
         '''
         returns the port currently used.
         '''
-        return self._port
+        return self._Port
 
     def GetVersion(self):
         self.write('V')
