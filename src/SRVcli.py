@@ -10,16 +10,20 @@ ComPort = "/dev/ttyUSB0"
 
 if __name__ == '__main__':
     print "Connecting"
-    s = SrvSerial( ComPort )
+    s = SrvSerial( ComPort, 0.5 )
     
     # move around a bit
-    s.GoForward()
-    time.sleep( 2 )
-    s.GoBack()
-    time.sleep( 2 )
-    s.Stop()
-#    s.capture_frame()
-#    print s.get_jpeg()
+#    s.GoForward()
+#    time.sleep( 2 )
+#    s.GoBack()
+#    time.sleep( 2 )
+#    s.Stop()
+
+
+    img = s.GetImage()
+    f = open('nn.jpeg', 'w+')
+    f.write( img )
+    f.close()
     
     print "The end"
 
