@@ -3,24 +3,24 @@ Created on 27 Nov 2012
 
 @author: moz
 '''
-from SRVcom import Srv1
+from Surveyor.SrvSerial import SrvSerial
+import time
 
-ComPort = "/tmp/serial"
+ComPort = "/dev/ttyUSB0"
 
 if __name__ == '__main__':
-    s = Srv1( ComPort, False )
-    
     print "Connecting"
-    s.connect()
-    if not s.is_connected():
-        print "failed to connect"
-        exit() 
+    s = SrvSerial( ComPort )
     
-    print "Name is", s.getName()
+    # move around a bit
+    s.GoForward()
+    time.sleep( 2 )
+    s.GoBack()
+    time.sleep( 2 )
+    s.Stop()
+#    s.capture_frame()
+#    print s.get_jpeg()
     
-    s.capture_frame()
-    print s.get_jpeg()
-    
-    print "Disconnecting"
-    s.disconnect()
+    print "The end"
+
     
