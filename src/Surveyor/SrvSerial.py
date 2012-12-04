@@ -41,7 +41,7 @@ class SrvSerial(serial.Serial):
         try:
             self.GetVersion()
         except TimeoutWarning:
-            raise SerialException
+            raise SerialException( "Init failed. Is the robot turned on?")
         pass
 
     
