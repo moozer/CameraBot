@@ -107,8 +107,11 @@ class Test(unittest.TestCase):
         time.sleep( 0.3 )
         self.assertRaises(SerialException, SrvSerial, SrvSerialDeviceLocal )
         
-        
-
+    def testGetImage(self):
+        s = SrvSerial( SrvSerialDeviceLocal )
+        # the echo machine cannot handle sending images.
+        self.assertRaises( SerialException, s.GetImage )
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testContruction']
     unittest.main()
