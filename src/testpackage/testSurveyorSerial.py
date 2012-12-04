@@ -85,7 +85,29 @@ class Test(unittest.TestCase):
         s = SrvSerial( SrvSerialDeviceLocal )
         self.assertEqual( s.port, SrvSerialDeviceLocal )     
         self.assertEqual( s.version, 'V' ) # bogus Version 
-        pass       
+        pass
+    
+    def testForwardLeftRightBackStop(self):
+        s = SrvSerial( SrvSerialDeviceLocal )
+        s.GoForward()
+        s.GoBack()
+        s.GoLeft()
+        s.GoRight()
+        s.GoLeft()
+        s.Stop()
+        pass
+
+    def testNoConnection(self):
+        self._SocatPopen.kill()
+        time.sleep( 0.3 )
+        self.assertRaises(SerialException, SrvSerial, SrvSerialDeviceLocal)
+
+    def testNoEcho(self):
+        self._EchoPopen.kill()
+        time.sleep( 0.3 )
+        self.assertRaises(SerialException, SrvSerial, SrvSerialDeviceLocal )
+        
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testContruction']
