@@ -8,14 +8,15 @@ import threading
 import sys
 
 class SrvControl( object ):
-    _ContinueLoop = threading.Event  # if set, continue looping.
-    _DoAcquisition = threading.Event # if set, do acquisition as fast as possible
+    _ContinueLoop = threading.Event()  # if set, continue looping.
+    _DoAcquisition = threading.Event() # if set, do acquisition as fast as possible
     _AcqisitionCallback = None # hold the callback to call whenever a new image is available
     _LastestImage = None       # the latest image retrieved. Could be initialized with something cool :-) 
     
     def __init__(self, port = "/dev/ttyUSB0" ):
         self._SrcConnection = SrvSerial( port )
         self._ContinueLoop.clear()
+        self._DoAcquisition.clear()
 
     def StartLoop(self):
         ''' Loop control, starts the acquisition and command loop '''
