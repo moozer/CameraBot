@@ -38,7 +38,7 @@ class JoystickController(object):
     def Enable(self):
         ''' Loop control, starts the acquisition and command loop '''
         self._ContinueLoop.set()
-        self._SrvThread = threading.Thread(target=self._loop)
+        self._SrvThread = threading.Thread(target=self._loop, name="JoystickController")
         self._SrvThread.start()
 
     def Disable(self):

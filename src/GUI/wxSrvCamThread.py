@@ -10,8 +10,8 @@ Inspiration:
 import wx
 from GUI.wxCameraPanel import CameraPanel
 
-#from Surveyor.SrvThread import SrvControl
-from DummyBot.DummyBot import DummyBot
+from Surveyor.SrvThread import SrvControl
+#from DummyBot.DummyBot import DummyBot
 from Controller.JoystickController import JoystickController
 
 
@@ -20,9 +20,9 @@ if __name__ == '__main__':
     app = wx.App(0)
     wx.Log_SetActiveTarget(wx.LogStderr())
     frame = wx.Frame(parent=None, id=wx.ID_ANY, title='UpCam.py', style=wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER)
-#    robot = SrvControl("/dev/ttyUSB0")
-#    robot.StartLoop()
-    robot = DummyBot()
+
+    robot = SrvControl("/dev/ttyUSB0")
+    #robot = DummyBot()
     
     ctrl = JoystickController( robot )
     

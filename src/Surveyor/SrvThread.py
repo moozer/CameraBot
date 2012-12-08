@@ -6,22 +6,28 @@ Created on 5 Dec 2012
 from Surveyor.SrvSerial import SrvSerial
 import threading
 import sys
+import Image
+import StringIO
 
 class SrvControl( object ):
+    _DEFAULTIMAGESIZE = (180, 180)
+    
     _ContinueLoop = threading.Event()  # if set, continue looping.
     _DoAcquisition = threading.Event() # if set, do acquisition as fast as possible
     _AcqisitionCallback = None # hold the callback to call whenever a new image is available
-    _LastestImage = None       # the latest image retrieved. Could be initialized with something cool :-) 
-    
+    _CurrentDirection = [0,0] # neutral position
+    _Image = Image.new("RGB", _DEFAULTIMAGESIZE, "white")  # the latest image retrieved. 
+
     def __init__(self, port = "/dev/ttyUSB0" ):
         self._SrcConnection = SrvSerial( port )
         self._ContinueLoop.clear()
         self._DoAcquisition.clear()
+        self.StartLoop()
 
     def StartLoop(self):
         ''' Loop control, starts the acquisition and command loop '''
         self._ContinueLoop.set()
-        self._SrvThread = threading.Thread(target=self._loop)
+        self._SrvThread = threading.Thread(target=self._loop, name="SrvControl")
         self._SrvThread.start()
 
     def StopLoop(self):
@@ -40,7 +46,7 @@ class SrvControl( object ):
 
     @property
     def image(self):
-        return self._LastestImage
+        return self._Image
     
     def _loop(self):
         ''' the command loop
@@ -54,7 +60,17 @@ class SrvControl( object ):
             if self._DoAcquisition.isSet():              
                 try:
                     self._SrcConnection.GetImage()
-                    self._LastestImage = self._SrcConnection.image
+
+#                    -        stream = StringIO.StringIO( self.RobotCtl.image )
+#-        if stream != None:
+#-            img = wx.ImageFromStream(stream)
+#-            bmp = wx.BitmapFromImage(img)
+#-            dc.DrawBitmap(bmp, 0, 0, True)
+
+#                    self._LastestImage = self._SrcConnection.image
+                    stream = StringIO.StringIO( self._SrcConnection.image )
+                    image = Image.open(stream)
+                    self._Image = image
                     self._AcqisitionCallback()
                 except Exception, e:
                     print >> sys.stderr, "Exception caught (%s): %s"%(type(e), e.message)
