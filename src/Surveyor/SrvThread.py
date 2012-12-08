@@ -17,6 +17,7 @@ class SrvControl( object ):
     _AcqisitionCallback = None # hold the callback to call whenever a new image is available
     _CurrentDirection = [0,0] # neutral position
     _Image = Image.new("RGB", _DEFAULTIMAGESIZE, "white")  # the latest image retrieved. 
+    _NextDirection = None
 
     def __init__(self, port = "/dev/ttyUSB0" ):
         self._SrcConnection = SrvSerial( port )
@@ -48,14 +49,41 @@ class SrvControl( object ):
     def image(self):
         return self._Image
     
+
+    def _ChangeDirection(self, NextDirection):
+        Directions = [['7', '4', '1'], 
+                      ['8', '5', '2'], 
+                      ['9', '6', '3'] ]
+        #{ '(-1,1)'  : "7",  '(0,1)'  : "8",  '(1,1)'  : "9",
+        #               '(-1,0)'  : "4",  '(0,0)'  : "5",  '(1,0)'  : "6",
+        #               '(-1,-1)' : "1",  '(0,-1)' : "2",  '(1,-1)' : "3"
+        #               }
+        
+#        if not str(NextDirection) in Directions:
+#            OutStr = "Unknown direction: %s"%NextDirection
+#            NextDirection = None
+#            raise ValueError( OutStr )
+
+        self._SrcConnection.SendCommand( Directions[ int(NextDirection[0])+1][int(NextDirection[1])+1] )
+        pass
+    
+    
     def _loop(self):
         ''' the command loop
         This function is the only one using the SrvSerial object, so no need for locks
         '''
         while( self._ContinueLoop.isSet() ):
-#            if NextCommand:
-#                Issue( NextCommand )
-#                continue
+            if self._NextDirection:
+                try:
+                    self._ChangeDirection( self._NextDirection )
+                    self._CurrentDirection = self._NextDirection
+                    self._NextDirection = None
+                except Exception, e:
+                    print >> sys.stderr, "Error setting direction (will retry): %s"%e
+                except Warning, w:
+                    print >> sys.stderr, "Warning setting direction (will retry): %s"%w
+                
+                continue
 #    
             if self._DoAcquisition.isSet():              
                 try:
@@ -76,4 +104,18 @@ class SrvControl( object ):
                     print >> sys.stderr, "Exception caught (%s): %s"%(type(e), e.message)
                 continue
 
+    @property
+    def direction(self):
+        return self._CurrentDirection
+    
+    def SetDirection(self, Direction ):
+        if Direction == self._CurrentDirection:
+            return 
+        
+        if(     ( Direction[0] > 1 or Direction[0] < -1 )
+             or ( Direction[1] > 1 or Direction[1] < -1 ) ):
+            raise ValueError( "Directions must be -1 <= 0 <= 1. Direction specified %s"%Direction)
+
+        # I think this is ok from a multithread perspective since = is an atomic operation in python
+        self._NextDirection = Direction
             
