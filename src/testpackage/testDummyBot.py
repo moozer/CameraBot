@@ -10,6 +10,11 @@ Direction_NE = [1, 1]
 Direction_SW = [-1, -1]
 Direction_Neutral = [0,0]
 
+JustAnInteger = 0
+def fctAddOne():
+    global JustAnInteger 
+    JustAnInteger += 1
+    
 class Test(unittest.TestCase):
 
 
@@ -32,6 +37,22 @@ class Test(unittest.TestCase):
         OldImg = Bot.image
         Bot.SetDirection( Direction_NE )
         self.assertNotEquals(OldImg, Bot.image )
+
+    def testAcqFlag(self):
+        Bot = DummyBot()
+        
+        Bot.EnableAcquisition( fctAddOne )
+
+        OldInt = JustAnInteger
+        Bot.SetDirection( Direction_NE )
+        self.assertEqual(OldInt+1, JustAnInteger)
+        
+        Bot.DisableAcquisition()
+        OldInt = JustAnInteger
+        Bot.SetDirection( Direction_Neutral )
+        self.assertEqual(OldInt, JustAnInteger) # fct not called..
+        
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testDummy']

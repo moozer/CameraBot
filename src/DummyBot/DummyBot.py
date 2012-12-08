@@ -15,6 +15,8 @@ class DummyBot(object):
 
     _CurrentDirection = [0,0] # neutral position
     _image = Image.new("RGB", _IMAGESIZE, "white")
+    _AcqFunction = None
+    _EnableAcquisition = True # default is to acquire.
     
     @property
     def direction(self):
@@ -33,19 +35,23 @@ class DummyBot(object):
             raise ValueError( "Directions must be -1 <= 0 <= 1. Direction specified %s"%Direction)
         
         self._CurrentDirection = Direction
-        self._GenerateImage()
+        
+        if self._EnableAcquisition:
+            self._GenerateImage()
+            if self._AcqFunction:
+                self._AcqFunction()
         pass
     
     def _GenerateImage(self):
         self._image = Image.new("RGB", self._IMAGESIZE, "white")
 
         # local vars
-        FontSize = 14
-        font = "Verdana.ttf"
+        #FontSize = 14
+        #font = "Verdana.ttf"
         text = str(self._CurrentDirection)
                 
         #font_dir = "/usr/share/fonts/truetype/msttcorefonts/"
-        font_size = FontSize
+        #font_size = FontSize
         #fnt = ImageFont.truetype(font_dir+font, font_size)
         fnt = ImageFont.load_default()
         lineWidth = 20
@@ -67,3 +73,14 @@ class DummyBot(object):
     @property
     def image(self):
         return self._image
+
+    def EnableAcquisition(self, callbackFunction = None):
+        self._AcqFunction = callbackFunction
+        self._EnableAcquisition = True
+
+    
+    def DisableAcquisition(self):
+        self._EnableAcquisition = None
+    
+    
+    
