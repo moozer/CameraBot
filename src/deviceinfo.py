@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # Project Network - Logitech G27 / Xbox 360 controller and others
+# by Nicklas Jensen
+
 
 import os
 import pygame  		# Imports pygame library that are made for developing games
@@ -43,6 +45,7 @@ try:
 			for button in downbutton:
 				print "Pressed button is", button.button
 				if button.button == 0:			# The exit button
+					print "Button 0 is exit button."
 					return
 		
 		# Button Part Up
@@ -52,11 +55,13 @@ try:
 			t.tick(80)
 	loop()
 
-except:
+except Exception, e:
 	print "No device found"
 	print "Please insert device and try agian" 
 	print "Shutting down now"
+	print "Exception was: %s"%e
 
-#Nicklas Jensen
+
+print "Program terminated"
 
 
