@@ -12,6 +12,7 @@ from GUI.wxCameraPanel import CameraPanel
 
 #from Surveyor.SrvThread import SrvControl
 from DummyBot.DummyBot import DummyBot
+from Controller.JoystickController import JoystickController
 
 
 if __name__ == '__main__':
@@ -23,9 +24,13 @@ if __name__ == '__main__':
 #    robot.StartLoop()
     robot = DummyBot()
     
+    ctrl = JoystickController( robot )
+    
+    # visual stuff
     campanel = CameraPanel(frame, robot)
     campanel.SetSize(robot.image.size)
 
+    # main frame
     sizer = wx.BoxSizer(wx.VERTICAL)
     sizer.Add(campanel, 1, wx.EXPAND|wx.ALL, 5)
     frame.SetSizer(sizer)
