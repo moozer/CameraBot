@@ -14,7 +14,7 @@ class DummyBot(object):
     _IMAGESIZE = (512, 512)
 
     _CurrentDirection = [0,0] # neutral position
-    _image = Image.new("RGB", _IMAGESIZE, "white")
+    _image = Image.new("RGB", _IMAGESIZE, "white")  # t
     _AcqFunction = None
     _EnableAcquisition = True # default is to acquire.
     
@@ -43,7 +43,7 @@ class DummyBot(object):
         pass
     
     def _GenerateImage(self):
-        self._image = Image.new("RGB", self._IMAGESIZE, "white")
+        #self._image = Image.new("RGB", self._IMAGESIZE, "white")
 
         # local vars
         #FontSize = 14
@@ -68,19 +68,19 @@ class DummyBot(object):
         draw.text((10,0), text, font=fnt, fill=bg)      # add some text to the main
         del draw 
         
-        self._image = img  
+        self._image = img
     
     @property
     def image(self):
+        ''' return the latest image as a PIL.image object '''
         return self._image
 
     def EnableAcquisition(self, callbackFunction = None):
         self._AcqFunction = callbackFunction
         self._EnableAcquisition = True
 
-    
     def DisableAcquisition(self):
-        self._EnableAcquisition = None
+        self._EnableAcquisition = False
     
     
     

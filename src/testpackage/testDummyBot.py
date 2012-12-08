@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
         OldImg = Bot.image
         Bot.SetDirection( Direction_NE )
         self.assertNotEquals(OldImg, Bot.image )
-
+        
     def testAcqFlag(self):
         Bot = DummyBot()
         
