@@ -8,16 +8,25 @@ from Surveyor.SrvSerial import *
 from subprocess import Popen
 import serial
 import time
+import string
+import sys
+from unittest.case import SkipTest
 
 SrvSerialDeviceLocal = "SocatTmpSerialLocal"
 SrvSerialDeviceRobot = "SocatTmpSerialRobot"
-SocatCmdLine = ["/usr/bin/socat", "-x", "-v", "PTY,link=%s"%(SrvSerialDeviceLocal,), "PTY,link=%s"%(SrvSerialDeviceRobot,)]
+
+# Socat command for ouputting data transferred to stderr
+#SocatCmdLine = ["/usr/bin/socat", "-x", "-v", "PTY,link=%s"%(SrvSerialDeviceLocal,), "PTY,link=%s"%(SrvSerialDeviceRobot,)]
+
+SocatCmdLine = ["/usr/bin/socat", "PTY,link=%s"%(SrvSerialDeviceLocal,), "PTY,link=%s"%(SrvSerialDeviceRobot,)]
 TimeoutTime = 0.5
 EchoCmd = ['python', 'EchoMachine.py']
 
 class Test(unittest.TestCase):
 
     def setUp(self):
+        # for test debugging
+        #print >> sys.stderr, "%s"%string.join(SocatCmdLine, " ")
         self._SocatPopen = Popen(SocatCmdLine)
         time.sleep( TimeoutTime )
         self._EchoPopen = Popen( EchoCmd )
