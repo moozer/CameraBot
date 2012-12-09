@@ -6,7 +6,7 @@
 # - http://www.linuxquestions.org/questions/programming-9/python-can-you-add-text-to-an-image-in-python-632773/
 
 
-from PIL import Image
+import Image
 import ImageFont
 import ImageDraw
         
