@@ -12,14 +12,15 @@ import StringIO
 class SrvControl( object ):
     _DEFAULTIMAGESIZE = (180, 180)
     
-    _ContinueLoop = threading.Event()  # if set, continue looping.
-    _DoAcquisition = threading.Event() # if set, do acquisition as fast as possible
-    _AcqisitionCallback = None # hold the callback to call whenever a new image is available
-    _CurrentDirection = [0,0] # neutral position
+    _ContinueLoop = threading.Event()   # if set, continue looping.
+    _DoAcquisition = threading.Event()  # if set, do acquisition as fast as possible
+    _AcqisitionCallback = None          # hold the callback to call whenever a new image is available
+    _CurrentDirection = [0,0]           # neutral position
     _Image = Image.new("RGB", _DEFAULTIMAGESIZE, "white")  # the latest image retrieved. 
-    _NextDirection = None
+    _NextDirection = None               # will attempt to set netxdirection untill it is None
 
     def __init__(self, port = "/dev/ttyUSB0" ):
+        ''' Constructor, opens connection and starts the loop '''
         self._SrcConnection = SrvSerial( port )
         self._ContinueLoop.clear()
         self._DoAcquisition.clear()
@@ -43,26 +44,20 @@ class SrvControl( object ):
         self._DoAcquisition.set()
         
     def DisableAcquisition(self):
+        ''' Disable retrieval of images from the SRV '''
         self._DoAcquisition.clear()
 
     @property
     def image(self):
+        ''' the last image (as PIL.image) '''
         return self._Image
     
 
     def _ChangeDirection(self, NextDirection):
+        ''' get the axis [x,y] values and sets the appropriate 1..9 value in the SRV '''
         Directions = [['7', '4', '1'], 
                       ['8', '5', '2'], 
                       ['9', '6', '3'] ]
-        #{ '(-1,1)'  : "7",  '(0,1)'  : "8",  '(1,1)'  : "9",
-        #               '(-1,0)'  : "4",  '(0,0)'  : "5",  '(1,0)'  : "6",
-        #               '(-1,-1)' : "1",  '(0,-1)' : "2",  '(1,-1)' : "3"
-        #               }
-        
-#        if not str(NextDirection) in Directions:
-#            OutStr = "Unknown direction: %s"%NextDirection
-#            NextDirection = None
-#            raise ValueError( OutStr )
 
         self._SrcConnection.SendCommand( Directions[ int(NextDirection[0])+1][int(NextDirection[1])+1] )
         pass
@@ -73,29 +68,24 @@ class SrvControl( object ):
         This function is the only one using the SrvSerial object, so no need for locks
         '''
         while( self._ContinueLoop.isSet() ):
+            # first: set new direction if any
             if self._NextDirection:
                 try:
                     self._ChangeDirection( self._NextDirection )
                     self._CurrentDirection = self._NextDirection
                     self._NextDirection = None
-                except Exception, e:
-                    print >> sys.stderr, "Error setting direction (will retry): %s"%e
                 except Warning, w:
                     print >> sys.stderr, "Warning setting direction (will retry): %s"%w
+                except Exception, e:
+                    print >> sys.stderr, "Error setting direction (will retry): %s"%e
                 
                 continue
-#    
+
+            # retrieve new image
             if self._DoAcquisition.isSet():              
                 try:
                     self._SrcConnection.GetImage()
 
-#                    -        stream = StringIO.StringIO( self.RobotCtl.image )
-#-        if stream != None:
-#-            img = wx.ImageFromStream(stream)
-#-            bmp = wx.BitmapFromImage(img)
-#-            dc.DrawBitmap(bmp, 0, 0, True)
-
-#                    self._LastestImage = self._SrcConnection.image
                     stream = StringIO.StringIO( self._SrcConnection.image )
                     image = Image.open(stream)
                     self._Image = image
@@ -106,9 +96,13 @@ class SrvControl( object ):
 
     @property
     def direction(self):
+        ''' the last set direction '''
         return self._CurrentDirection
     
     def SetDirection(self, Direction ):
+        ''' Sets a new direction
+        This sets an internal flag, which the command loop picks up.
+        '''
         if Direction == self._CurrentDirection:
             return 
         
