@@ -30,6 +30,7 @@ class SrvControl( object ):
         ''' Loop control, starts the acquisition and command loop '''
         self._ContinueLoop.set()
         self._SrvThread = threading.Thread(target=self._loop, name="SrvControl")
+        self._SrvThread.daemon = True 
         self._SrvThread.start()
 
     def StopLoop(self):
