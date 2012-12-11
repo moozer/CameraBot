@@ -15,11 +15,15 @@ class SrvSerial(serial.Serial):
     ''' handles single threaded communication with surveyor srv-1
     '''
     
-    _SendWait = 0.1 # wait this long after each send to the device.
     _version = None # the version string
     _image = None   # holds the last image retrieved
-    
-    def __init__(self, SrvSerialDevice, Timeout = 0.1):
+
+    # set in constructor
+    _MaxRetries = 3 # wait for timeout multiple times (default: 3)
+    _Timeout = 1 # wait this long for response (default: 1 sec, ie. very conservative)
+    _SendWait = 1 # wait this long after each send to the device. (default: 1 sec, ie. very conservative)
+
+    def __init__(self, SrvSerialDevice, Timeout = 0.3, SendWait = 0.3):
         ''' @param SrvSerialDeviceLocal: The serial device to use 
         '''
         
@@ -35,29 +39,37 @@ class SrvSerial(serial.Serial):
   
         # save class vars
         self._Timeout = Timeout
+        self._SendWait = SendWait
 
         try:
             self.GetVersion()
         except TimeoutWarning:
             raise SerialException( "Init failed. Is the robot turned on?")
-        pass
-
     
 
     def SendCommand(self, Command ):
         # clean up and send command
         self.flush()
-        time.sleep(self._SendWait)
+        time.sleep(self._SendWait) # if this is excluded, you see your own transmits ?!
         self.write(Command)
         time.sleep(self._SendWait)
 
         # check for proper return value
-        # We expect something like '#Version ....'
-        r = self.read(4096) # read everything until timeout
-        if len(r) == 0:
-            raise TimeoutWarning
-        if r[0] != '#':
-            raise SerialException("Bad response received: Expected '%s' got '%s'" % ('#', r))
+        # We expect something like '#%s'%Command
+        Retries = 0
+        while True:
+            r = self.read(4096) # read everything until timeout
+            if len(r) == 0:
+                Retries += 1
+                if Retries > self._MaxRetries:
+                    raise TimeoutWarning( "Timeout after %d retries"%(Retries-1) )
+                else:
+                    continue
+            if r[0] != '#':
+                raise SerialException("Bad response received: Expected '%s' got '%s'" % ('#', r))
+            
+            # no probs? then continue
+            break
         
         return r[1:]
 

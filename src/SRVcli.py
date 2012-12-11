@@ -12,17 +12,21 @@ from Surveyor.SrvThread import SrvControl
 def DoSimpleSerial(ComPort):
     ''' this uses the underlying com interface '''
     print "Connecting"
-    s = SrvSerial(ComPort, 0.5)
+    s = SrvSerial(ComPort, 0.05, 0.05)
+    print "Connected"
 # move around a bit
-    s.GoForward()
-    time.sleep(2)
+#    s.GoForward()
+#    time.sleep(2)
     s.GoBack()
-    time.sleep(2)
+    time.sleep(0.5)
     s.Stop()
-    img = s.GetImage()
-    f = open('nn.jpeg', 'w+')
-    f.write(img)
-    f.close()
+    
+#    img = s.GetImage()
+#    print "got image"
+#    f = open('nn.jpeg', 'w+')
+#    f.write(img)
+#    f.close()
+    
     print "The end"
 
 ComPort = "/dev/ttyUSB1"
@@ -50,9 +54,9 @@ def DoThreadedConnection(ComPort):
 
 
 if __name__ == '__main__':
-    print "simple serial"
+#    print "simple serial"
 #    DoSimpleSerial(ComPort)
-    print "simple serial ended"
+#    print "simple serial ended"
 
 
     print "threaded serial"
