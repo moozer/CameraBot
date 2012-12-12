@@ -20,9 +20,9 @@ class SrvControl( object ):
     _NextDirection = None               # will attempt to set netxdirection untill it is None
 
     # wait times for the serial module 
-    # for SrvCli, 0.4/0.4 is the best for
-    _WAITTIME = 0.5
-    _READTIMEOUT = 0.5
+    # for SrvCli, 0.04/0.04 is the best
+    _WAITTIME = 0.05
+    _READTIMEOUT = 0.05
 
     def __init__(self, port = "/dev/ttyUSB0" ):
         ''' Constructor, opens connection and starts the loop '''
