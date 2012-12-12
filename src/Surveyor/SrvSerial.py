@@ -7,6 +7,7 @@ from serial.serialutil import SerialException
 import serial
 import time
 from struct import unpack
+import sys
 
 class TimeoutWarning( Warning ):
     pass
@@ -64,6 +65,7 @@ class SrvSerial(serial.Serial):
                 if Retries > self._MaxRetries:
                     raise TimeoutWarning( "Timeout after %d retries"%(Retries-1) )
                 else:
+                    print >> sys.stderr, "Timeout #%d. Will retry."%Retries                    
                     continue
             if r[0] != '#':
                 raise SerialException("Bad response received: Expected '%s' got '%s'" % ('#', r))

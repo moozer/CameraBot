@@ -19,9 +19,14 @@ class SrvControl( object ):
     _Image = Image.new("RGB", _DEFAULTIMAGESIZE, "white")  # the latest image retrieved. 
     _NextDirection = None               # will attempt to set netxdirection untill it is None
 
+    # wait times for the serial module 
+    # for SrvCli, 0.4/0.4 is the best for
+    _WAITTIME = 0.5
+    _READTIMEOUT = 0.5
+
     def __init__(self, port = "/dev/ttyUSB0" ):
         ''' Constructor, opens connection and starts the loop '''
-        self._SrcConnection = SrvSerial( port )
+        self._SrcConnection = SrvSerial( port, self._WAITTIME, self._READTIMEOUT )
         self._ContinueLoop.clear()
         self._DoAcquisition.clear()
         self.StartLoop()
